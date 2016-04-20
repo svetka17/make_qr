@@ -139,10 +139,8 @@ end;
 
  function qr_bin(p_text in varchar2) return blob
  as
- p_bin          CLOB  :=NULL;
- p_t  VARCHAR2 (32000);
  p_b clob := null;
- p_b_tmp clob := null;
+ p_b_tmp varchar2(23660);
  p_l number := 0;
  p_u number := 0;
  p_v number := 0;
@@ -151,22 +149,21 @@ end;
  d number;
  dgi number;
  bmp_tmp blob;
- strhex varchar2(32000) := '424DE62F0000000000003E0000002800000031010000310100000100010000000000A82F00000000000000000000000000000000000000000000FFFFFF00';
- --b1 number:=0;b2 number:=0;b3 number:=0;b4 number:=0;b5 number:=0;b6 number:=0;b7 number:=0;b8 number:=0;b9 number:=0;b10 number:=0;
- --b11 number:=0;b12 number:=0;b13 number:=0;b14 number:=0;b15 number:=0;b16 number:=0;b17 number:=0;b18 number:=0;b19 number:=0;b20 number:=0;
- --b21 number:=0;b22 number:=0;b23 number:=0;b24 number:=0;b25 number:=0;b26 number:=0;b27 number:=0;b28 number:=0;b29 number:=0;b30 number:=0;
+ strhex varchar2(200) := '424DE62F0000000000003E0000002800000031010000310100000100010000000000A82F00000000000000000000000000000000000000000000FFFFFF00';
  ostatok_mod number :=0;
  count_byte number :=0; count_byte1 number :=0;
  korr_byte number :=0;
  p_type varchar2(1) := '';
  korr_mnogochlen varchar2(300) := '';
- korr_mnogochlen_bin varchar2(32000) := '';
+ korr_mnogochlen_bin varchar2(250) := '';
  korr_mnogochlen_bin_tmp varchar2(32000) := '';
- korr_mnogochlen_tutto varchar2(32000) := '';
+ korr_mnogochlen_tutto varchar2(20000) := '';
  tutto varchar2(32000) := '';
  p_tmp varchar2(8) := '11101100';
+ sss number :=0;
+ 
  korr_mn varchar2(32000) := '';
- draw varchar2(32000) := '';
+ draw varchar2(200);
  aaa varchar2(32000) := '';
  aaa_tmp varchar2(32000) := '';
  poisk_coor varchar2(300) := '';
@@ -179,8 +176,16 @@ end;
   kod_maski number :=0;
 kod_versii varchar2(25) := '';
 colonka number;
-stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag number; flag_lr number;
+stroka number; tmp1 number; s_s varchar2(2):='';flag number; flag_lr number;
+
+  type t1 is table of number index by binary_integer;
+  type t2 is table of t1 index by binary_integer;
+  z t2;
+
+  cor10 t1;
+  cor_tmp t1;
  begin
+
  select length(p_text) into p_l from dual;
      if p_l=0 or p_l>2330 then
         dbms_lob.createtemporary(bmp_tmp, true);
@@ -193,26 +198,30 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
         return bmp_tmp;
         dbms_lob.freetemporary(bmp_tmp);
      end if;
+     
+     
  select length(hex2bin(rawtohex(convert(p_text,'utf8')) )) into p_l from dual;
  for s in (
  select u, val,typ from (
- select u, val,typ from ( 
+ select u, val,typ from /*qr*/ ( 
   select 1 u, 152 val, 'l' typ from dual union all    select 2 u, 272 val, 'l' typ from dual union all    select 3 u, 440 val, 'l' typ from dual union all    select 4 u, 640 val, 'l' typ from dual union all    select 5 u, 864 val, 'l' typ from dual union all    select 6 u, 1088 val, 'l' typ from dual union all    select 7 u, 1248 val, 'l' typ from dual union all    select 8 u, 1552 val, 'l' typ from dual union all    select 9 u, 1856 val, 'l' typ from dual union all    select 10 u, 2192 val, 'l' typ from dual union all    select 11 u, 2592 val, 'l' typ from dual union all    select 12 u, 2960 val, 'l' typ from dual union all    select 13 u, 3424 val, 'l' typ from dual union all    select 14 u, 3688 val, 'l' typ from dual union all    select 15 u, 4184 val, 'l' typ from dual union all    select 16 u, 4712 val, 'l' typ from dual union all    select 17 u, 5176 val, 'l' typ from dual union all    select 18 u, 5768 val, 'l' typ from dual union all    select 19 u, 6360 val, 'l' typ from dual union all    select 20 u, 6888 val, 'l' typ from dual union all    select 21 u, 7456 val, 'l' typ from dual union all    select 22 u, 8048 val, 'l' typ from dual union all    select 23 u, 8752 val, 'l' typ from dual union all    select 24 u, 9392 val, 'l' typ from dual union all    select 25 u, 10208 val, 'l' typ from dual union all    select 26 u, 10960 val, 'l' typ from dual union all    select 27 u, 11744 val, 'l' typ from dual union all    select 28 u, 12248 val, 'l' typ from dual union all    select 29 u, 13048 val, 'l' typ from dual union all    select 30 u, 13880 val, 'l' typ from dual union all    select 31 u, 14744 val, 'l' typ from dual union all    select 32 u, 15640 val, 'l' typ from dual union all    select 33 u, 16568 val, 'l' typ from dual union all    select 34 u, 17528 val, 'l' typ from dual union all    select 35 u, 18448 val, 'l' typ from dual union all    select 36 u, 19472 val, 'l' typ from dual union all    select 37 u, 20528 val, 'l' typ from dual union all    select 38 u, 21616 val, 'l' typ from dual union all    select 39 u, 22496 val, 'l' typ from dual union all    select 40 u, 23648 val, 'l' typ from dual union all
   select 1 u, 128 val, 'm' typ from dual union all    select 2 u, 224 val, 'm' typ from dual union all    select 3 u, 352 val, 'm' typ from dual union all    select 4 u, 512 val, 'm' typ from dual union all    select 5 u, 688 val, 'm' typ from dual union all    select 6 u, 864 val, 'm' typ from dual union all    select 7 u, 992 val, 'm' typ from dual union all    select 8 u, 1232 val, 'm' typ from dual union all    select 9 u, 1456 val, 'm' typ from dual union all    select 10 u, 1728 val, 'm' typ from dual union all    select 11 u, 2032 val, 'm' typ from dual union all    select 12 u, 2320 val, 'm' typ from dual union all    select 13 u, 2672 val, 'm' typ from dual union all    select 14 u, 2920 val, 'm' typ from dual union all    select 15 u, 3320 val, 'm' typ from dual union all    select 16 u, 3624 val, 'm' typ from dual union all    select 17 u, 4056 val, 'm' typ from dual union all    select 18 u, 4504 val, 'm' typ from dual union all    select 19 u, 5016 val, 'm' typ from dual union all    select 20 u, 5352 val, 'm' typ from dual union all    select 21 u, 5712 val, 'm' typ from dual union all    select 22 u, 6256 val, 'm' typ from dual union all    select 23 u, 6880 val, 'm' typ from dual union all    select 24 u, 7312 val, 'm' typ from dual union all    select 25 u, 8000 val, 'm' typ from dual union all    select 26 u, 8496 val, 'm' typ from dual union all    select 27 u, 9024 val, 'm' typ from dual union all    select 28 u, 9544 val, 'm' typ from dual union all    select 29 u, 10136 val, 'm' typ from dual union all    select 30 u, 10984 val, 'm' typ from dual union all    select 31 u, 11640 val, 'm' typ from dual union all    select 32 u, 12328 val, 'm' typ from dual union all    select 33 u, 13048 val, 'm' typ from dual union all    select 34 u, 13800 val, 'm' typ from dual union all    select 35 u, 14496 val, 'm' typ from dual union all    select 36 u, 15312 val, 'm' typ from dual union all    select 37 u, 15936 val, 'm' typ from dual union all    select 38 u, 16816 val, 'm' typ from dual union all    select 39 u, 17728 val, 'm' typ from dual union all    select 40 u, 18672 val, 'm' typ from dual union all
   select 1 u, 104 val, 'q' typ from dual union all    select 2 u, 176 val, 'q' typ from dual union all    select 3 u, 272 val, 'q' typ from dual union all    select 4 u, 384 val, 'q' typ from dual union all    select 5 u, 496 val, 'q' typ from dual union all    select 6 u, 608 val, 'q' typ from dual union all    select 7 u, 704 val, 'q' typ from dual union all    select 8 u, 880 val, 'q' typ from dual union all    select 9 u, 1056 val, 'q' typ from dual union all    select 10 u, 1232 val, 'q' typ from dual union all    select 11 u, 1440 val, 'q' typ from dual union all    select 12 u, 1648 val, 'q' typ from dual union all    select 13 u, 1952 val, 'q' typ from dual union all    select 14 u, 2088 val, 'q' typ from dual union all    select 15 u, 2360 val, 'q' typ from dual union all    select 16 u, 2600 val, 'q' typ from dual union all    select 17 u, 2936 val, 'q' typ from dual union all    select 18 u, 3176 val, 'q' typ from dual union all    select 19 u, 3560 val, 'q' typ from dual union all    select 20 u, 3880 val, 'q' typ from dual union all    select 21 u, 4096 val, 'q' typ from dual union all    select 22 u, 4544 val, 'q' typ from dual union all    select 23 u, 4912 val, 'q' typ from dual union all    select 24 u, 5312 val, 'q' typ from dual union all    select 25 u, 5744 val, 'q' typ from dual union all    select 26 u, 6032 val, 'q' typ from dual union all    select 27 u, 6464 val, 'q' typ from dual union all    select 28 u, 6968 val, 'q' typ from dual union all    select 29 u, 7288 val, 'q' typ from dual union all    select 30 u, 7880 val, 'q' typ from dual union all    select 31 u, 8264 val, 'q' typ from dual union all    select 32 u, 8920 val, 'q' typ from dual union all    select 33 u, 9368 val, 'q' typ from dual union all    select 34 u, 9848 val, 'q' typ from dual union all    select 35 u, 10288 val, 'q' typ from dual union all    select 36 u, 10832 val, 'q' typ from dual union all    select 37 u, 11408 val, 'q' typ from dual union all    select 38 u, 12016 val, 'q' typ from dual union all    select 39 u, 12656 val, 'q' typ from dual union all    select 40 u, 13328 val, 'q' typ from dual union all
   select 1 u, 72 val, 'h' typ from dual union all    select 2 u, 128 val, 'h' typ from dual union all    select 3 u, 208 val, 'h' typ from dual union all    select 4 u, 288 val, 'h' typ from dual union all    select 5 u, 368 val, 'h' typ from dual union all    select 6 u, 480 val, 'h' typ from dual union all    select 7 u, 528 val, 'h' typ from dual union all    select 8 u, 688 val, 'h' typ from dual union all    select 9 u, 800 val, 'h' typ from dual union all    select 10 u, 976 val, 'h' typ from dual union all    select 11 u, 1120 val, 'h' typ from dual union all    select 12 u, 1264 val, 'h' typ from dual union all    select 13 u, 1440 val, 'h' typ from dual union all    select 14 u, 1576 val, 'h' typ from dual union all    select 15 u, 1784 val, 'h' typ from dual union all    select 16 u, 2024 val, 'h' typ from dual union all    select 17 u, 2264 val, 'h' typ from dual union all    select 18 u, 2504 val, 'h' typ from dual union all    select 19 u, 2728 val, 'h' typ from dual union all    select 20 u, 3080 val, 'h' typ from dual union all    select 21 u, 3248 val, 'h' typ from dual union all    select 22 u, 3536 val, 'h' typ from dual union all    select 23 u, 3712 val, 'h' typ from dual union all    select 24 u, 4112 val, 'h' typ from dual union all    select 25 u, 4304 val, 'h' typ from dual union all    select 26 u, 4768 val, 'h' typ from dual union all    select 27 u, 5024 val, 'h' typ from dual union all    select 28 u, 5288 val, 'h' typ from dual union all    select 29 u, 5608 val, 'h' typ from dual union all    select 30 u, 5960 val, 'h' typ from dual union all    select 31 u, 6344 val, 'h' typ from dual union all    select 32 u, 6760 val, 'h' typ from dual union all    select 33 u, 7208 val, 'h' typ from dual union all    select 34 u, 7688 val, 'h' typ from dual union all    select 35 u, 7888 val, 'h' typ from dual union all    select 36 u, 8432 val, 'h' typ from dual union all    select 37 u, 8768 val, 'h' typ from dual union all    select 38 u, 9136 val, 'h' typ from dual union all    select 39 u, 9776 val, 'h' typ from dual union all    select 40 u, 10208 val, 'h' typ from dual
-  ) where val>nvl(p_l+4+decode(u,1,8,2,8,3,8,4,8,5,8,6,8,7,8,8,8,9,8,16),0) /*and typ='h'  здесь можно указать конкретно, какой уровень коррекции использовать или вынести в параметр*/ order by val,typ desc)
+  ) where val>nvl(p_l+4+decode(u,1,8,2,8,3,8,4,8,5,8,6,8,7,8,8,8,9,8,16),0) /*and typ='l' */ /*and typ='h'  здесь можно указать конкретно, какой уровень коррекции использовать или вынести в параметр*/ order by val,typ desc)
   where rownum=1)
   loop
+   
   p_type:=s.typ;
   p_u:=s.u;
      
-      select '0100'||lpad(make_qr.hex2bin(trim(to_char(length(make_qr.hex2bin(rawtohex(convert(p_text,'utf8')) ))/8,'XXXX'))) --make_qr.hex2bin(to_char(length(make_qr.hex2bin(rawtohex(convert(p_text,'utf8')) ))/8))
+      select '0100'||lpad(make_qr.hex2bin(trim(to_char(length(make_qr.hex2bin(rawtohex(convert(p_text,'utf8')) ))/8,'XXXX'))) 
+      --make_qr.hex2bin(to_char(length(make_qr.hex2bin(rawtohex(convert(p_text,'utf8')) ))/8))
       ,decode(s.u,1,8,2,8,3,8,4,8,5,8,6,8,7,8,8,8,9,8,16),'0')||make_qr.hex2bin(rawtohex(convert(p_text,'utf8')) ) into p_b  from dual;
       if (mod(length(p_b),8)<>0) then
       p_b:=p_b||rpad('0',8-mod(length(p_b),8),'0');
       end if;
-  
+        
           p_v:=(s.val-length(p_b))/8;
 
           for i in 0 .. p_v-1 loop
@@ -221,7 +230,7 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
           end loop;
  
         --кол-во блоков, на которое бить
-          for ss in (select u, val, typ from (
+          for ss in (select u, val, typ from /*qr*/ (
             select 1 u, 1 val, 'l' typ from dual union all    select 2 u, 1 val, 'l' typ from dual union all    select 3 u, 1 val, 'l' typ from dual union all    select 4 u, 1 val, 'l' typ from dual union all    select 5 u, 1 val, 'l' typ from dual union all    select 6 u, 2 val, 'l' typ from dual union all    select 7 u, 2 val, 'l' typ from dual union all    select 8 u, 2 val, 'l' typ from dual union all    select 9 u, 2 val, 'l' typ from dual union all    select 10 u, 4 val, 'l' typ from dual union all    select 11 u, 4 val, 'l' typ from dual union all    select 12 u, 4 val, 'l' typ from dual union all    select 13 u, 4 val, 'l' typ from dual union all    select 14 u, 4 val, 'l' typ from dual union all    select 15 u, 6 val, 'l' typ from dual union all    select 16 u, 6 val, 'l' typ from dual union all    select 17 u, 6 val, 'l' typ from dual union all    select 18 u, 6 val, 'l' typ from dual union all    select 19 u, 7 val, 'l' typ from dual union all    select 20 u, 8 val, 'l' typ from dual union all    select 21 u, 8 val, 'l' typ from dual union all    select 22 u, 9 val, 'l' typ from dual union all    select 23 u, 9 val, 'l' typ from dual union all    select 24 u, 10 val, 'l' typ from dual union all    select 25 u, 12 val, 'l' typ from dual union all    select 26 u, 12 val, 'l' typ from dual union all    select 27 u, 12 val, 'l' typ from dual union all    select 28 u, 13 val, 'l' typ from dual union all    select 29 u, 14 val, 'l' typ from dual union all    select 30 u, 15 val, 'l' typ from dual union all    select 31 u, 16 val, 'l' typ from dual union all    select 32 u, 17 val, 'l' typ from dual union all    select 33 u, 18 val, 'l' typ from dual union all    select 34 u, 19 val, 'l' typ from dual union all    select 35 u, 19 val, 'l' typ from dual union all    select 36 u, 20 val, 'l' typ from dual union all    select 37 u, 21 val, 'l' typ from dual union all    select 38 u, 22 val, 'l' typ from dual union all    select 39 u, 24 val, 'l' typ from dual union all    select 40 u, 25 val, 'l' typ from dual union all
             select 1 u, 1 val, 'm' typ from dual union all    select 2 u, 1 val, 'm' typ from dual union all    select 3 u, 1 val, 'm' typ from dual union all    select 4 u, 2 val, 'm' typ from dual union all    select 5 u, 2 val, 'm' typ from dual union all    select 6 u, 4 val, 'm' typ from dual union all    select 7 u, 4 val, 'm' typ from dual union all    select 8 u, 4 val, 'm' typ from dual union all    select 9 u, 5 val, 'm' typ from dual union all    select 10 u, 5 val, 'm' typ from dual union all    select 11 u, 5 val, 'm' typ from dual union all    select 12 u, 8 val, 'm' typ from dual union all    select 13 u, 9 val, 'm' typ from dual union all    select 14 u, 9 val, 'm' typ from dual union all    select 15 u, 10 val, 'm' typ from dual union all    select 16 u, 10 val, 'm' typ from dual union all    select 17 u, 11 val, 'm' typ from dual union all    select 18 u, 13 val, 'm' typ from dual union all    select 19 u, 14 val, 'm' typ from dual union all    select 20 u, 16 val, 'm' typ from dual union all    select 21 u, 17 val, 'm' typ from dual union all    select 22 u, 17 val, 'm' typ from dual union all    select 23 u, 18 val, 'm' typ from dual union all    select 24 u, 20 val, 'm' typ from dual union all    select 25 u, 21 val, 'm' typ from dual union all    select 26 u, 23 val, 'm' typ from dual union all    select 27 u, 25 val, 'm' typ from dual union all    select 28 u, 26 val, 'm' typ from dual union all    select 29 u, 28 val, 'm' typ from dual union all    select 30 u, 29 val, 'm' typ from dual union all    select 31 u, 31 val, 'm' typ from dual union all    select 32 u, 33 val, 'm' typ from dual union all    select 33 u, 35 val, 'm' typ from dual union all    select 34 u, 37 val, 'm' typ from dual union all    select 35 u, 38 val, 'm' typ from dual union all    select 36 u, 40 val, 'm' typ from dual union all    select 37 u, 43 val, 'm' typ from dual union all    select 38 u, 45 val, 'm' typ from dual union all    select 39 u, 47 val, 'm' typ from dual union all    select 40 u, 49 val, 'm' typ from dual union all
             select 1 u, 1 val, 'q' typ from dual union all    select 2 u, 1 val, 'q' typ from dual union all    select 3 u, 2 val, 'q' typ from dual union all    select 4 u, 2 val, 'q' typ from dual union all    select 5 u, 4 val, 'q' typ from dual union all    select 6 u, 4 val, 'q' typ from dual union all    select 7 u, 6 val, 'q' typ from dual union all    select 8 u, 6 val, 'q' typ from dual union all    select 9 u, 8 val, 'q' typ from dual union all    select 10 u, 8 val, 'q' typ from dual union all    select 11 u, 8 val, 'q' typ from dual union all    select 12 u, 10 val, 'q' typ from dual union all    select 13 u, 12 val, 'q' typ from dual union all    select 14 u, 16 val, 'q' typ from dual union all    select 15 u, 12 val, 'q' typ from dual union all    select 16 u, 17 val, 'q' typ from dual union all    select 17 u, 16 val, 'q' typ from dual union all    select 18 u, 18 val, 'q' typ from dual union all    select 19 u, 21 val, 'q' typ from dual union all    select 20 u, 20 val, 'q' typ from dual union all    select 21 u, 23 val, 'q' typ from dual union all    select 22 u, 23 val, 'q' typ from dual union all    select 23 u, 25 val, 'q' typ from dual union all    select 24 u, 27 val, 'q' typ from dual union all    select 25 u, 29 val, 'q' typ from dual union all    select 26 u, 34 val, 'q' typ from dual union all    select 27 u, 34 val, 'q' typ from dual union all    select 28 u, 35 val, 'q' typ from dual union all    select 29 u, 38 val, 'q' typ from dual union all    select 30 u, 40 val, 'q' typ from dual union all    select 31 u, 43 val, 'q' typ from dual union all    select 32 u, 45 val, 'q' typ from dual union all    select 33 u, 48 val, 'q' typ from dual union all    select 34 u, 51 val, 'q' typ from dual union all    select 35 u, 53 val, 'q' typ from dual union all    select 36 u, 56 val, 'q' typ from dual union all    select 37 u, 59 val, 'q' typ from dual union all    select 38 u, 62 val, 'q' typ from dual union all    select 39 u, 65 val, 'q' typ from dual union all    select 40 u, 68 val, 'q' typ from dual union all
@@ -230,22 +239,24 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
               loop
                p_v:=ss.val;--p_v=кол-во блоков
               end loop;
+              
+              
+              
                 count_byte:=(s.val/8)/p_v;
                 ostatok_mod:=p_v-mod(s.val/8,p_v);
                 if p_v>1 then
                 count_byte:=/*round*/trunc((s.val/8)/p_v);
                 ostatok_mod:=p_v-mod((s.val/8),p_v);-- +1 (блоки нумеруем с 0);--с какого номера блока увеличивать на 1 байт
                 end if;
-  STD.DEBUG_MESSAGE('make_qr', s.u||' '||s.typ||' '||p_v||' '||count_byte||' '||ostatok_mod||' '||SQLCODE||SQLERRM||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);
 
             --кол-во байтов коррекции на один блок
             for ss in (
-              select * from (
+              select val from /*qr*/ (
                 select 1 u, 7 val, 'l' typ from dual union all    select 2 u, 10 val, 'l' typ from dual union all    select 3 u, 15 val, 'l' typ from dual union all    select 4 u, 20 val, 'l' typ from dual union all    select 5 u, 26 val, 'l' typ from dual union all    select 6 u, 18 val, 'l' typ from dual union all    select 7 u, 20 val, 'l' typ from dual union all    select 8 u, 24 val, 'l' typ from dual union all    select 9 u, 30 val, 'l' typ from dual union all    select 10 u, 18 val, 'l' typ from dual union all    select 11 u, 20 val, 'l' typ from dual union all    select 12 u, 24 val, 'l' typ from dual union all    select 13 u, 26 val, 'l' typ from dual union all    select 14 u, 30 val, 'l' typ from dual union all    select 15 u, 22 val, 'l' typ from dual union all    select 16 u, 24 val, 'l' typ from dual union all    select 17 u, 28 val, 'l' typ from dual union all    select 18 u, 30 val, 'l' typ from dual union all    select 19 u, 28 val, 'l' typ from dual union all    select 20 u, 28 val, 'l' typ from dual union all    select 21 u, 28 val, 'l' typ from dual union all    select 22 u, 28 val, 'l' typ from dual union all    select 23 u, 30 val, 'l' typ from dual union all    select 24 u, 30 val, 'l' typ from dual union all    select 25 u, 26 val, 'l' typ from dual union all    select 26 u, 28 val, 'l' typ from dual union all    select 27 u, 30 val, 'l' typ from dual union all    select 28 u, 30 val, 'l' typ from dual union all    select 29 u, 30 val, 'l' typ from dual union all    select 30 u, 30 val, 'l' typ from dual union all    select 31 u, 30 val, 'l' typ from dual union all    select 32 u, 30 val, 'l' typ from dual union all    select 33 u, 30 val, 'l' typ from dual union all    select 34 u, 30 val, 'l' typ from dual union all    select 35 u, 30 val, 'l' typ from dual union all    select 36 u, 30 val, 'l' typ from dual union all    select 37 u, 30 val, 'l' typ from dual union all    select 38 u, 30 val, 'l' typ from dual union all    select 39 u, 30 val, 'l' typ from dual union all    select 40 u, 30 val, 'l' typ from dual union all
                 select 1 u, 10 val, 'm' typ from dual union all    select 2 u, 16 val, 'm' typ from dual union all    select 3 u, 26 val, 'm' typ from dual union all    select 4 u, 18 val, 'm' typ from dual union all    select 5 u, 24 val, 'm' typ from dual union all    select 6 u, 16 val, 'm' typ from dual union all    select 7 u, 18 val, 'm' typ from dual union all    select 8 u, 22 val, 'm' typ from dual union all    select 9 u, 22 val, 'm' typ from dual union all    select 10 u, 26 val, 'm' typ from dual union all    select 11 u, 30 val, 'm' typ from dual union all    select 12 u, 22 val, 'm' typ from dual union all    select 13 u, 22 val, 'm' typ from dual union all    select 14 u, 24 val, 'm' typ from dual union all    select 15 u, 24 val, 'm' typ from dual union all    select 16 u, 28 val, 'm' typ from dual union all    select 17 u, 28 val, 'm' typ from dual union all    select 18 u, 26 val, 'm' typ from dual union all    select 19 u, 26 val, 'm' typ from dual union all    select 20 u, 26 val, 'm' typ from dual union all    select 21 u, 26 val, 'm' typ from dual union all    select 22 u, 28 val, 'm' typ from dual union all    select 23 u, 28 val, 'm' typ from dual union all    select 24 u, 28 val, 'm' typ from dual union all    select 25 u, 28 val, 'm' typ from dual union all    select 26 u, 28 val, 'm' typ from dual union all    select 27 u, 28 val, 'm' typ from dual union all    select 28 u, 28 val, 'm' typ from dual union all    select 29 u, 28 val, 'm' typ from dual union all    select 30 u, 28 val, 'm' typ from dual union all    select 31 u, 28 val, 'm' typ from dual union all    select 32 u, 28 val, 'm' typ from dual union all    select 33 u, 28 val, 'm' typ from dual union all    select 34 u, 28 val, 'm' typ from dual union all    select 35 u, 28 val, 'm' typ from dual union all    select 36 u, 28 val, 'm' typ from dual union all    select 37 u, 28 val, 'm' typ from dual union all    select 38 u, 28 val, 'm' typ from dual union all    select 39 u, 28 val, 'm' typ from dual union all    select 40 u, 28 val, 'm' typ from dual union all
                 select 1 u, 13 val, 'q' typ from dual union all    select 2 u, 22 val, 'q' typ from dual union all    select 3 u, 18 val, 'q' typ from dual union all    select 4 u, 26 val, 'q' typ from dual union all    select 5 u, 18 val, 'q' typ from dual union all    select 6 u, 24 val, 'q' typ from dual union all    select 7 u, 18 val, 'q' typ from dual union all    select 8 u, 22 val, 'q' typ from dual union all    select 9 u, 20 val, 'q' typ from dual union all    select 10 u, 24 val, 'q' typ from dual union all    select 11 u, 28 val, 'q' typ from dual union all    select 12 u, 26 val, 'q' typ from dual union all    select 13 u, 24 val, 'q' typ from dual union all    select 14 u, 20 val, 'q' typ from dual union all    select 15 u, 30 val, 'q' typ from dual union all    select 16 u, 24 val, 'q' typ from dual union all    select 17 u, 28 val, 'q' typ from dual union all    select 18 u, 28 val, 'q' typ from dual union all    select 19 u, 26 val, 'q' typ from dual union all    select 20 u, 30 val, 'q' typ from dual union all    select 21 u, 28 val, 'q' typ from dual union all    select 22 u, 30 val, 'q' typ from dual union all    select 23 u, 30 val, 'q' typ from dual union all    select 24 u, 30 val, 'q' typ from dual union all    select 25 u, 30 val, 'q' typ from dual union all    select 26 u, 28 val, 'q' typ from dual union all    select 27 u, 30 val, 'q' typ from dual union all    select 28 u, 30 val, 'q' typ from dual union all    select 29 u, 30 val, 'q' typ from dual union all    select 30 u, 30 val, 'q' typ from dual union all    select 31 u, 30 val, 'q' typ from dual union all    select 32 u, 30 val, 'q' typ from dual union all    select 33 u, 30 val, 'q' typ from dual union all    select 34 u, 30 val, 'q' typ from dual union all    select 35 u, 30 val, 'q' typ from dual union all    select 36 u, 30 val, 'q' typ from dual union all    select 37 u, 30 val, 'q' typ from dual union all    select 38 u, 30 val, 'q' typ from dual union all    select 39 u, 30 val, 'q' typ from dual union all    select 40 u, 30 val, 'q' typ from dual union all
                 select 1 u, 17 val, 'h' typ from dual union all    select 2 u, 28 val, 'h' typ from dual union all    select 3 u, 22 val, 'h' typ from dual union all    select 4 u, 16 val, 'h' typ from dual union all    select 5 u, 22 val, 'h' typ from dual union all    select 6 u, 28 val, 'h' typ from dual union all    select 7 u, 26 val, 'h' typ from dual union all    select 8 u, 26 val, 'h' typ from dual union all    select 9 u, 24 val, 'h' typ from dual union all    select 10 u, 28 val, 'h' typ from dual union all    select 11 u, 24 val, 'h' typ from dual union all    select 12 u, 28 val, 'h' typ from dual union all    select 13 u, 22 val, 'h' typ from dual union all    select 14 u, 24 val, 'h' typ from dual union all    select 15 u, 24 val, 'h' typ from dual union all    select 16 u, 30 val, 'h' typ from dual union all    select 17 u, 28 val, 'h' typ from dual union all    select 18 u, 28 val, 'h' typ from dual union all    select 19 u, 26 val, 'h' typ from dual union all    select 20 u, 28 val, 'h' typ from dual union all    select 21 u, 30 val, 'h' typ from dual union all    select 22 u, 24 val, 'h' typ from dual union all    select 23 u, 30 val, 'h' typ from dual union all    select 24 u, 30 val, 'h' typ from dual union all    select 25 u, 30 val, 'h' typ from dual union all    select 26 u, 30 val, 'h' typ from dual union all    select 27 u, 30 val, 'h' typ from dual union all    select 28 u, 30 val, 'h' typ from dual union all    select 29 u, 30 val, 'h' typ from dual union all    select 30 u, 30 val, 'h' typ from dual union all    select 31 u, 30 val, 'h' typ from dual union all    select 32 u, 30 val, 'h' typ from dual union all    select 33 u, 30 val, 'h' typ from dual union all    select 34 u, 30 val, 'h' typ from dual union all    select 35 u, 30 val, 'h' typ from dual union all    select 36 u, 30 val, 'h' typ from dual union all    select 37 u, 30 val, 'h' typ from dual union all    select 38 u, 30 val, 'h' typ from dual union all    select 39 u, 30 val, 'h' typ from dual union all    select 40 u, 30 val, 'h' typ from dual
-                ) where u=s.u and typ=s.typ )
+                )  where u=s.u and typ=s.typ )
             loop
             korr_byte:=ss.val;
             end loop;
@@ -282,12 +293,13 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
             --перевод корректирующго многочлена в двоичную систему (по 8 бит)
             FOR i IN 1..korr_byte LOOP
             korr_mnogochlen_bin:=korr_mnogochlen_bin||lpad( make_qr.hex2bin(make_qr.dec2hex( REGEXP_substr(korr_mnogochlen,'[^,]+',1,i)) ) ,8,'0');--lpad( hex2bin(dec2hex( REGEXP_substr(korr_mnogochlen,'[^,]+',1,i)) ) ) ,8,'0');
+            cor10(i):=REGEXP_substr(korr_mnogochlen,'[^,]+',1,i);
             END LOOP;
-  --STD.DEBUG_MESSAGE('make_qr', 'korr_mnogochlen_bin='||korr_mnogochlen_bin);
-     
+  
        tmp:=0; 
       count_byte1:=count_byte;
       korr_mnogochlen_tutto:=''; aaa_tmp:='';
+
       --формирую все корректирующие байты для всех блоков
       for i in 0 .. p_v-1 loop
       
@@ -298,7 +310,7 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
             aaa_tmp:=substr(p_b,tmp*8+1,count_byte1*8);
      
                 for iii in 0 .. /*max_2(count_byte1,korr_byte)*/count_byte1-1 loop
-    
+
                 fff:=nvl(substr(aaa_tmp,1,8),'00000000');
               
                        if bin2dec(fff)<>0 then 
@@ -307,30 +319,24 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                        
                         korr_mnogochlen_bin_tmp:='';
                             for j in 0 .. korr_byte-1 loop
-                            
-                            korr_mnogochlen_bin_tmp:=korr_mnogochlen_bin_tmp||
-                            lpad(make_qr.hex2bin(trim(to_char(
-                            mod(bin2dec(substr(korr_mnogochlen_bin/*korr_mn*/,j*8+1,8))+dgi,255)
-                            ,'XXXX'))),8,'0');
+                            cor_tmp(j):=galua(mod(cor10(j+1)+dgi,255));
                             end loop; 
-                        korr_mn:=korr_mnogochlen_bin_tmp;    
-                        korr_mnogochlen_bin_tmp:='';
-                            for j in 0 .. korr_byte-1 loop
-                           
-                            korr_mnogochlen_bin_tmp:=korr_mnogochlen_bin_tmp||
-                            lpad(make_qr.hex2bin(trim(to_char(
-                            galua(bin2dec(substr(/*korr_mnogochlen_bin*/korr_mn,j*8+1,8)) )
-                            ,'XXXX'))),8,'0');
-                            end loop; 
-                        korr_mn:=korr_mnogochlen_bin_tmp;    
-                        korr_mnogochlen_bin_tmp:='';    
+  
                             for j in 0 .. /*korr_byte*/max_2(count_byte1,korr_byte)-1 loop
                                 p_tmp:=substr(aaa_tmp,/*iii*8+*/(j+1)*8+1,8); if p_tmp is null then p_tmp:='00000000'; end if;
-                                aaa:='';  aaa:=substr(/*korr_mnogochlen_bin*/korr_mn,j*8+1,8); if aaa is null then aaa:='00000000'; end if;
+                                aaa:='';  
+                                if j<korr_byte then
+                                aaa:=lpad(make_qr.dec2bin(cor_tmp(j)),8,'0');
+                                end if;
+
+                                if aaa is null then aaa:='00000000'; end if;
                                 korr_mnogochlen_bin_tmp:=korr_mnogochlen_bin_tmp||
                                 bin_xor_bin(aaa,p_tmp ) ;
+
                             end loop;
+
                             aaa_tmp:=korr_mnogochlen_bin_tmp;
+
                         korr_mn:=korr_mnogochlen_bin_tmp;    
                         korr_mnogochlen_bin_tmp:='';     
                        else
@@ -376,7 +382,7 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                  end loop;
      end loop;   
      aaa_tmp:='';aaa:='';  
-       
+    
        
        --рисуем массив 0-белый квадрат 1-черный
        case   
@@ -423,15 +429,13 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
           end case;
           
        quadro:=21 + (s.u-1)*4;
-       
-       for i in 1..quadro loop
+   
+        for i in 1..quadro loop
             for j in 1..quadro loop
-            draw:=draw||'-';
+                z(i)(j):=9;
             end loop;
-            draw:=draw||'
-';
-       end loop; 
-
+        end loop;
+         
        if count_poisk<>0 then
            FOR i IN 1..count_poisk LOOP
            if i=1 then mincoor:=to_number(REGEXP_substr(poisk_coor,'[^,]+',1,i)); end if;
@@ -447,37 +451,35 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                         if  not ((m=mincoor and n=mincoor) or (m=mincoor and n=maxcoor) or (m=maxcoor and n=mincoor)) or mincoor=maxcoor
                         then 
                             for k in 1 .. quadro loop
-                                for kk in 1 .. (quadro+1) loop
-                                    if m=k and n=kk then 
-                                     --STD.DEBUG_MESSAGE('make_qr', m||' '||n||' '||SQLCODE||SQLERRM||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE);  
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*k+1+kk, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*k+1+kk+1, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*k+1+kk-1, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k-1)+1+kk-1, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k-1)+1+kk, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k-1)+1+kk+1, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k+1)+1+kk-1, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k+1)+1+kk, 1);
-                                    draw:= regexp_replace(draw,'.','0', (quadro+1)*(k+1)+1+kk+1, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-2)+1+kk-2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-2)+1+kk-1, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-2)+1+kk, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-2)+1+kk+1, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-2)+1+kk+2, 1);
+                                for kk in 1 .. (quadro/*+1*/) loop
+                                    if m+1=k and n+1=kk then 
                                     
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+2)+1+kk-2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+2)+1+kk-1, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+2)+1+kk, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+2)+1+kk+1, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+2)+1+kk+2, 1);
-                                    
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-1)+1+kk-2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*k+1+kk-2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+1)+1+kk-2, 1);
-                                    
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k-1)+1+kk+2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*k+1+kk+2, 1);
-                                    draw:= regexp_replace(draw,'.','1', (quadro+1)*(k+1)+1+kk+2, 1);
+                                    z(k)(kk):=1;
+                                    z(k)(kk+1):=0;
+                                    z(k)(kk-1):=0;
+                                    z(k-1)(kk-1):=0;
+                                    z(k-1)(kk):=0;
+                                    z(k-1)(kk+1):=0;
+                                    z(k+1)(kk-1):=0;
+                                    z(k+1)(kk):=0;
+                                    z(k+1)(kk+1):=0;
+                                    z(k-2)(kk-2):=1;
+                                    z(k-2)(kk-1):=1;
+                                    z(k-2)(kk):=1;
+                                    z(k-2)(kk+1):=1;
+                                    z(k-2)(kk+2):=1;
+                                    z(k+2)(kk-2):=1;
+                                    z(k+2)(kk-1):=1;
+                                    z(k+2)(kk):=1;
+                                    z(k+2)(kk+1):=1;
+                                    z(k+2)(kk+2):=1;
+                                    z(k+1)(kk+2):=1;
+                                    z(k)(kk+2):=1;
+                                    z(k-1)(kk+2):=1;
+                                    z(k+1)(kk-2):=1;
+                                    z(k)(kk-2):=1;
+                                    z(k-1)(kk-2):=1;
+  
                                     end if; 
                                 end loop;
                             end loop;
@@ -485,249 +487,51 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                     end loop;            
            END LOOP;
        end if;
-       
-      -- STD.DEBUG_MESSAGE('make_qr',substr(draw,1,2000));--||' '||SQLCODE||SQLERRM||DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); 
+
        --поисковые узоры в углах
        
          --левый верхний
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+1+4, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+1+4, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+1+4, 1);
-            
-            draw:= regexp_replace(draw,'.','1', 1, 1);
-            draw:= regexp_replace(draw,'.','1', 2, 1);
-            draw:= regexp_replace(draw,'.','1', 3, 1);
-            draw:= regexp_replace(draw,'.','1', 4, 1);
-            draw:= regexp_replace(draw,'.','1', 5, 1);
-            draw:= regexp_replace(draw,'.','1', 6, 1);
-            draw:= regexp_replace(draw,'.','1', 7, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*2+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*3+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*4+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*5+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*2+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*3+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*4+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*5+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+6, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+2, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+3, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+4, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+6, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+1+7, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+1+1, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  8, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*6+1+7, 1);
+            z(1)(1):=1; z(1)(2):=1; z(1)(3):=1; z(1)(4):=1; z(1)(5):=1; z(1)(6):=1; z(1)(7):=1; z(1)(8):=0;
+            z(2)(1):=1; z(2)(2):=0; z(2)(3):=0; z(2)(4):=0; z(2)(5):=0; z(2)(6):=0; z(2)(7):=1; z(2)(8):=0;
+            z(3)(1):=1; z(3)(2):=0; z(3)(3):=1; z(3)(4):=1; z(3)(5):=1; z(3)(6):=0; z(3)(7):=1; z(3)(8):=0;
+            z(4)(1):=1; z(4)(2):=0; z(4)(3):=1; z(4)(4):=1; z(4)(5):=1; z(4)(6):=0; z(4)(7):=1; z(4)(8):=0;
+            z(5)(1):=1; z(5)(2):=0; z(5)(3):=1; z(5)(4):=1; z(5)(5):=1; z(5)(6):=0; z(5)(7):=1; z(5)(8):=0;
+            z(6)(1):=1; z(6)(2):=0; z(6)(3):=0; z(6)(4):=0; z(6)(5):=0; z(6)(6):=0; z(6)(7):=1; z(6)(8):=0;
+            z(7)(1):=1; z(7)(2):=1; z(7)(3):=1; z(7)(4):=1; z(7)(5):=1; z(7)(6):=1; z(7)(7):=1; z(7)(8):=0;
+            z(8)(1):=0; z(8)(2):=0; z(8)(3):=0; z(8)(4):=0; z(8)(5):=0; z(8)(6):=0; z(8)(7):=0; z(8)(8):=0;
             
             --правый верхний
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*3+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*4+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*2+(quadro-4), 1);
+            z(1)(quadro-7):=0; z(1)(quadro-6):=1; z(1)(quadro-5):=1; z(1)(quadro-4):=1; z(1)(quadro-3):=1; z(1)(quadro-2):=1; z(1)(quadro-1):=1; z(1)(quadro):=1;
+            z(2)(quadro-7):=0; z(2)(quadro-6):=1; z(2)(quadro-5):=0; z(2)(quadro-4):=0; z(2)(quadro-3):=0; z(2)(quadro-2):=0; z(2)(quadro-1):=0; z(2)(quadro):=1;
+            z(3)(quadro-7):=0; z(3)(quadro-6):=1; z(3)(quadro-5):=0; z(3)(quadro-4):=1; z(3)(quadro-3):=1; z(3)(quadro-2):=1; z(3)(quadro-1):=0; z(3)(quadro):=1;
+            z(4)(quadro-7):=0; z(4)(quadro-6):=1; z(4)(quadro-5):=0; z(4)(quadro-4):=1; z(4)(quadro-3):=1; z(4)(quadro-2):=1; z(4)(quadro-1):=0; z(4)(quadro):=1;
+            z(5)(quadro-7):=0; z(5)(quadro-6):=1; z(5)(quadro-5):=0; z(5)(quadro-4):=1; z(5)(quadro-3):=1; z(5)(quadro-2):=1; z(5)(quadro-1):=0; z(5)(quadro):=1;
+            z(6)(quadro-7):=0; z(6)(quadro-6):=1; z(6)(quadro-5):=0; z(6)(quadro-4):=0; z(6)(quadro-3):=0; z(6)(quadro-2):=0; z(6)(quadro-1):=0; z(6)(quadro):=1;
+            z(7)(quadro-7):=0; z(7)(quadro-6):=1; z(7)(quadro-5):=1; z(7)(quadro-4):=1; z(7)(quadro-3):=1; z(7)(quadro-2):=1; z(7)(quadro-1):=1; z(7)(quadro):=1;
+            z(8)(quadro-7):=0; z(8)(quadro-6):=0; z(8)(quadro-5):=0; z(8)(quadro-4):=0; z(8)(quadro-3):=0; z(8)(quadro-2):=0; z(8)(quadro-1):=0; z(8)(quadro):=0;
             
-            draw:= regexp_replace(draw,'.','1', quadro, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-1, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-2, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-3, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-4, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-5, 1);
-            draw:= regexp_replace(draw,'.','1', quadro-6, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)+quadro, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*2+quadro, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*3+quadro, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*4+quadro, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*5+quadro, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+quadro, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*2+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*3+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*4+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*5+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-6), 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*6+(quadro-5), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-5), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-5), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+quadro, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-5), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*7+(quadro-7), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+(quadro-1), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+(quadro-1), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+(quadro-5), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+(quadro-5), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+(quadro-5), 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*2+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*3+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*4+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*5+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*6+(quadro-7), 1);
             
             --левый нижний
-           draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-4)+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-4)+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-4)+1+4, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-3)+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-3)+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-3)+1+4, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-5)+1+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-5)+1+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-5)+1+4, 1);
+            z(quadro-7)(1):=0; z(quadro-7)(2):=0; z(quadro-7)(3):=0; z(quadro-7)(4):=0; z(quadro-7)(5):=0; z(quadro-7)(6):=0; z(quadro-7)(7):=0; z(quadro-7)(8):=0;
+            z(quadro-6)(1):=1; z(quadro-6)(2):=1; z(quadro-6)(3):=1; z(quadro-6)(4):=1; z(quadro-6)(5):=1; z(quadro-6)(6):=1; z(quadro-6)(7):=1; z(quadro-6)(8):=0;
+            z(quadro-5)(1):=1; z(quadro-5)(2):=0; z(quadro-5)(3):=0; z(quadro-5)(4):=0; z(quadro-5)(5):=0; z(quadro-5)(6):=0; z(quadro-5)(7):=1; z(quadro-5)(8):=0;
+            z(quadro-4)(1):=1; z(quadro-4)(2):=0; z(quadro-4)(3):=1; z(quadro-4)(4):=1; z(quadro-4)(5):=1; z(quadro-4)(6):=0; z(quadro-4)(7):=1; z(quadro-4)(8):=0;
+            z(quadro-3)(1):=1; z(quadro-3)(2):=0; z(quadro-3)(3):=1; z(quadro-3)(4):=1; z(quadro-3)(5):=1; z(quadro-3)(6):=0; z(quadro-3)(7):=1; z(quadro-3)(8):=0;
+            z(quadro-2)(1):=1; z(quadro-2)(2):=0; z(quadro-2)(3):=1; z(quadro-2)(4):=1; z(quadro-2)(5):=1; z(quadro-2)(6):=0; z(quadro-2)(7):=1; z(quadro-2)(8):=0;
+            z(quadro-1)(1):=1; z(quadro-1)(2):=0; z(quadro-1)(3):=0; z(quadro-1)(4):=0; z(quadro-1)(5):=0; z(quadro-1)(6):=0; z(quadro-1)(7):=1; z(quadro-1)(8):=0;
+            z(quadro)(1):=1; z(quadro)(2):=1; z(quadro)(3):=1; z(quadro)(4):=1; z(quadro)(5):=1; z(quadro)(6):=1; z(quadro)(7):=1; z(quadro)(8):=0;
             
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+1, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+2, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+3, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+4, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+5, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+6, 1);
-            draw:= regexp_replace(draw,'.','1', (quadro+1)*(quadro-1)+7, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-2)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-3)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-4)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-5)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-6)+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-2)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-3)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-4)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-5)+1+6, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-6)+1+6, 1);
-            
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+1, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+2, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+3, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+4, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-7)+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+2, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+3, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+4, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+6, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-8)+1+7, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-3)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-4)+1+1, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-5)+1+1, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-3)+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-4)+1+5, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-5)+1+5, 1);
-            
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-1)+8, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-2)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-3)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-4)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-5)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-6)+1+7, 1);
-            draw:= regexp_replace(draw,'.','0',  (quadro+1)*(quadro-7)+1+7, 1);
-
          --полосы синхронизации
-               p_tmp:='1';mincoor:=6;
-                for kk in 8 .. (quadro-8) loop
-                draw:= regexp_replace(draw,'.',p_tmp, (quadro+1)*kk+1+mincoor, 1);
-                if p_tmp='1' then p_tmp:='0'; else p_tmp:='1'; end if;
+               dgi:=1;mincoor:=6;
+                for kk in 9 .. (quadro-8) loop
+                z(kk)(7):=dgi;
+                if dgi=1 then dgi:=0; else dgi:=1; end if;
                 end loop;
                 
-                p_tmp:='1';
-                for kk in 8 .. (quadro-8) loop
-                draw:= regexp_replace(draw,'.',p_tmp, (quadro+1)*mincoor+1+kk, 1);
-                if p_tmp='1' then p_tmp:='0'; else p_tmp:='1'; end if;
+                dgi:=1;
+                for kk in 9 .. (quadro-8) loop
+                z(7)(kk):=dgi;
+                if dgi=1 then dgi:=0; else dgi:=1; end if;
                 end loop;
               
               --код версии
@@ -769,21 +573,48 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                     when s.u=40 then kod_versii:='111001000100010101';
                   end case;
                    
-                   tmp:=0;
-                    for kk in (quadro-11) .. (quadro-9) loop
-                        for k in 0 .. 5 loop
-                        draw:= regexp_replace(draw,'.',substr(kod_versii,tmp*6+(k+1),1), (quadro+1)*kk+1+k, 1);
-                        end loop;
-                        tmp:=tmp+1;
-                    end loop;
-                    
-                    tmp:=0;
-                    for kk in (quadro+1)-12 .. (quadro+1)-10 loop
-                        for k in 0 .. 5 loop
-                        draw:= regexp_replace(draw,'.',substr(kod_versii,tmp*6+(k+1),1), (quadro+1)*k+kk+1, 1);
-                        end loop;
-                        tmp:=tmp+1;
-                    end loop;
+                  z(quadro-10)(1):=to_number(substr(kod_versii,1,1));
+                  z(quadro-10)(2):=to_number(substr(kod_versii,2,1));
+                  z(quadro-10)(3):=to_number(substr(kod_versii,3,1));
+                  z(quadro-10)(4):=to_number(substr(kod_versii,4,1));
+                  z(quadro-10)(5):=to_number(substr(kod_versii,5,1));
+                  z(quadro-10)(6):=to_number(substr(kod_versii,6,1));
+                  
+                  z(quadro-9)(1):=to_number(substr(kod_versii,7,1));
+                  z(quadro-9)(2):=to_number(substr(kod_versii,8,1));
+                  z(quadro-9)(3):=to_number(substr(kod_versii,9,1));
+                  z(quadro-9)(4):=to_number(substr(kod_versii,10,1));
+                  z(quadro-9)(5):=to_number(substr(kod_versii,11,1));
+                  z(quadro-9)(6):=to_number(substr(kod_versii,12,1));
+                  
+                  z(quadro-8)(1):=to_number(substr(kod_versii,13,1));
+                  z(quadro-8)(2):=to_number(substr(kod_versii,14,1));
+                  z(quadro-8)(3):=to_number(substr(kod_versii,15,1));
+                  z(quadro-8)(4):=to_number(substr(kod_versii,16,1));
+                  z(quadro-8)(5):=to_number(substr(kod_versii,17,1));
+                  z(quadro-8)(6):=to_number(substr(kod_versii,18,1));
+                  
+                  z(1)(quadro-10):=to_number(substr(kod_versii,1,1));
+                  z(2)(quadro-10):=to_number(substr(kod_versii,2,1));
+                  z(3)(quadro-10):=to_number(substr(kod_versii,3,1));
+                  z(4)(quadro-10):=to_number(substr(kod_versii,4,1));
+                  z(5)(quadro-10):=to_number(substr(kod_versii,5,1));
+                  z(6)(quadro-10):=to_number(substr(kod_versii,6,1));
+                  
+                  z(1)(quadro-9):=to_number(substr(kod_versii,7,1));
+                  z(2)(quadro-9):=to_number(substr(kod_versii,8,1));
+                  z(3)(quadro-9):=to_number(substr(kod_versii,9,1));
+                  z(4)(quadro-9):=to_number(substr(kod_versii,10,1));
+                  z(5)(quadro-9):=to_number(substr(kod_versii,11,1));
+                  z(6)(quadro-9):=to_number(substr(kod_versii,12,1));
+                  
+                  z(1)(quadro-8):=to_number(substr(kod_versii,13,1));
+                  z(2)(quadro-8):=to_number(substr(kod_versii,14,1));
+                  z(3)(quadro-8):=to_number(substr(kod_versii,15,1));
+                  z(4)(quadro-8):=to_number(substr(kod_versii,16,1));
+                  z(5)(quadro-8):=to_number(substr(kod_versii,17,1));
+                  z(6)(quadro-8):=to_number(substr(kod_versii,18,1));
+                   
               end if;    
               
               --код маски и уровня коррекции    
@@ -834,45 +665,44 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                     when s.typ='h' and kod_maski=6 then kod_versii:='000110100001100';
                     when s.typ='h' and kod_maski=7 then kod_versii:='000100000111011';
                   end case;      
+            z(quadro)(9):=to_number(substr(kod_versii,1,1));
+            z(quadro-1)(9):=to_number(substr(kod_versii,2,1));
+            z(quadro-2)(9):=to_number(substr(kod_versii,3,1));
+            z(quadro-3)(9):=to_number(substr(kod_versii,4,1));
+            z(quadro-4)(9):=to_number(substr(kod_versii,5,1));
+            z(quadro-5)(9):=to_number(substr(kod_versii,6,1));
+            z(quadro-6)(9):=to_number(substr(kod_versii,7,1));
+            z(quadro-7)(9):=1;
             
-            draw:= regexp_replace(draw,'.',substr(kod_versii,1,1),  (quadro+1)*(quadro-1)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,2,1),  (quadro+1)*(quadro-2)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,3,1),  (quadro+1)*(quadro-3)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,4,1),  (quadro+1)*(quadro-4)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,5,1),  (quadro+1)*(quadro-5)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,6,1),  (quadro+1)*(quadro-6)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,7,1),  (quadro+1)*(quadro-7)+1+8, 1);
-            draw:= regexp_replace(draw,'.','1',  (quadro+1)*(quadro-8)+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,8,1),  (quadro+1)*8+1+(quadro-8), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,9,1),  (quadro+1)*8+1+(quadro-7), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,10,1),  (quadro+1)*8+1+(quadro-6), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,11,1),  (quadro+1)*8+1+(quadro-5), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,12,1),  (quadro+1)*8+1+(quadro-4), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,13,1),  (quadro+1)*8+1+(quadro-3), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,14,1),  (quadro+1)*8+1+(quadro-2), 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,15,1),  (quadro+1)*8+1+(quadro-1), 1); 
-               
-            draw:= regexp_replace(draw,'.',substr(kod_versii,1,1),  (quadro+1)*8+1, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,2,1),  (quadro+1)*8+1+1, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,3,1),  (quadro+1)*8+1+2, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,4,1),  (quadro+1)*8+1+3, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,5,1),  (quadro+1)*8+1+4, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,6,1),  (quadro+1)*8+1+5, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,7,1),  (quadro+1)*8+1+7, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,8,1),  (quadro+1)*8+1+8, 1);
+            z(9)(quadro-7):=to_number(substr(kod_versii,8,1));
+            z(9)(quadro-6):=to_number(substr(kod_versii,9,1));
+            z(9)(quadro-5):=to_number(substr(kod_versii,10,1));
+            z(9)(quadro-4):=to_number(substr(kod_versii,11,1));
+            z(9)(quadro-3):=to_number(substr(kod_versii,12,1));
+            z(9)(quadro-2):=to_number(substr(kod_versii,13,1));
+            z(9)(quadro-1):=to_number(substr(kod_versii,14,1));
+            z(9)(quadro):=to_number(substr(kod_versii,15,1));
             
-            draw:= regexp_replace(draw,'.',substr(kod_versii,9,1),  (quadro+1)*7+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,10,1),  (quadro+1)*5+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,11,1),  (quadro+1)*4+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,12,1),  (quadro+1)*3+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,13,1),  (quadro+1)*2+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,14,1),  (quadro+1)*1+1+8, 1);
-            draw:= regexp_replace(draw,'.',substr(kod_versii,15,1),  (quadro+1)*0+1+8, 1);    
-            
+            z(9)(1):=to_number(substr(kod_versii,1,1));
+            z(9)(2):=to_number(substr(kod_versii,2,1));
+            z(9)(3):=to_number(substr(kod_versii,3,1));
+            z(9)(4):=to_number(substr(kod_versii,4,1));
+            z(9)(5):=to_number(substr(kod_versii,5,1));
+            z(9)(6):=to_number(substr(kod_versii,6,1));
+            z(9)(8):=to_number(substr(kod_versii,7,1));
+            z(9)(9):=to_number(substr(kod_versii,8,1));
+            z(8)(9):=to_number(substr(kod_versii,9,1));
+            z(6)(9):=to_number(substr(kod_versii,10,1));
+            z(5)(9):=to_number(substr(kod_versii,11,1));
+            z(4)(9):=to_number(substr(kod_versii,12,1));
+            z(3)(9):=to_number(substr(kod_versii,13,1));
+            z(2)(9):=to_number(substr(kod_versii,14,1));
+            z(1)(9):=to_number(substr(kod_versii,15,1));
+           
             --рисую сами данные
-            
+           
             tmp:=1; --1-вверх 0-вниз
-            s_s:=''; tmp1:=1;
+            s_s:=''; tmp1:=1; dgi:=0;
             colonka:=1;--(quadro-1)/2;
             stroka:=1;
             flag:=1; 
@@ -881,40 +711,33 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
             LOOP
                if flag=1 then
                s_s:=substr(tutto,tmp1,1);
-               if s_s='0' then s_s:='2'; end if;
-               if s_s='1' then s_s:='3'; end if;
+               if s_s='0' then sss:=2; end if;
+               if s_s='1' then sss:=3; end if;
                tmp1:=tmp1+1;
                flag:=0;
                end if;
                
                if tmp=1 and flag=0 then
-                           
-                            tmp_draw:=regexp_substr(draw,'.',(quadro+1)*(quadro-stroka)+1 +(quadro-colonka), 1);
-                           
-                            if tmp_draw='-' then
-                            draw:= regexp_replace(draw,'.',trim(s_s), (quadro+1)*(quadro-stroka)+1 +(quadro-colonka), 1);
+                  dgi:=z(quadro-stroka+1)(quadro-colonka+1);
+                  if dgi=9 then
+                            z(quadro-stroka+1)(quadro-colonka+1):=sss;
                             flag:=1;
                             else flag:=0;
-                            end if;
-
-
-                    if stroka=quadro and flag_lr=1 then tmp:=0; 
+                  end if; 
+                  if stroka=quadro and flag_lr=1 then tmp:=0; 
                          if colonka+2<>quadro-5 then colonka:=colonka+2; else colonka:=colonka+3; end if;
                          stroka:=stroka-1;  
-                           
-                    end if;
+                  end if;
                     if flag_lr=1 then stroka:=stroka+1; end if; 
-                    if flag_lr=0 then flag_lr:=1; colonka:=colonka+1; else flag_lr:=0; colonka:=colonka-1; end if;
-                    
+                    if flag_lr=0 then flag_lr:=1; colonka:=colonka+1; else flag_lr:=0; colonka:=colonka-1; end if;             
                     
                end if;
                
                if tmp=0 and flag=0 then
-               
-                            tmp_draw:=regexp_substr(draw,'.',(quadro+1)*(quadro-stroka)+1 +(quadro-colonka) , 1);
+                          dgi:=z(quadro-stroka+1)(quadro-colonka+1);
                             
-                            if tmp_draw='-' then
-                            draw:= regexp_replace(draw,'.',trim(s_s), (quadro+1)*(quadro-stroka)+1 +(quadro-colonka), 1);
+                            if dgi=9 then
+                            z(quadro-stroka+1)(quadro-colonka+1):=sss;
                             flag:=1;
                             else flag:=0;
                             end if;
@@ -926,39 +749,20 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
                     end if;
                     if flag_lr=1 then stroka:=stroka-1; end if;      
                     if flag_lr=0 then flag_lr:=1; colonka:=colonka+1; else flag_lr:=0; colonka:=colonka-1; end if;
-                      
+              
                end if;
             END LOOP;      
   
               --накладываю маску =0 - mod(stroka+colonka,2)
-                     
-              stroka:=0; colonka:=0;s_s:='';
+             for i in 0..quadro-1 loop
+                for j in 0..quadro-1 loop
+                    if mod(i+j,2)=0 then
+                        if z(i+1)(j+1)=3 then z(i+1)(j+1):=0; end if; 
+                        if z(i+1)(j+1)=2 then z(i+1)(j+1):=1; end if;
+                    end if;
+                end loop;
+             end loop;
               
-              for i in 1..length(draw) loop
-             
-              stroka:=trunc(i/(quadro+1))+1-1; 
-              colonka:=i-trunc(i/(quadro+1))*(quadro+1)-1;
-              s_s:=substr(draw,i,1);
-                  if s_s='2' or s_s='-'  then --это 0
-                    if mod(stroka+colonka,2)=0 then
-                    --if mod(colonka, 3)=0 then
-                    --if mod(stroka, 2)=0 then
-                    -- if mod(colonka+stroka, 3)=0 then
-                    -- if mod(mod(colonka*stroka, 2)+mod(colonka*stroka,3),2)=0 then
-                    draw:= regexp_replace(draw,'.','1', i, 1);
-                    end if;
-                  end if;
-                  
-                  if s_s='3' then --это 1
-                    if mod(stroka+colonka,2)=0 then
-                    --if mod(colonka, 3)=0 then
-                    --if mod(colonka+stroka, 3)=0 then
-                    --if mod(stroka, 2)=0 then
-                    -- if mod(mod(colonka*stroka, 2)+mod(colonka*stroka,3),2)=0 then
-                    draw:= regexp_replace(draw,'.','0', i, 1);
-                    end if;
-                  end if;
-              end loop;
   end loop;
 
  --конверт в bmp
@@ -981,20 +785,21 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
     '..',substr(lpad(make_qr.dec2hex((ceil(quadro/8)/*+4*/+d)*quadro),4,'0'),3,2),69,1),
     '..',substr(lpad(make_qr.dec2hex((ceil(quadro/8)/*+4*/+d)*quadro+62),4,'0'),1,2),7,1),
     '..',substr(lpad(make_qr.dec2hex((ceil(quadro/8)/*+4*/+d)*quadro+62),4,'0'),3,2),5,1);
- --   STD.DEBUG_MESSAGE('make_qr','strhex '||substr(strhex,1,1999)||' ');
+
   aaa:='';
   FOR i IN 0..61 LOOP
   aaa := aaa ||chr(to_number(substr(strhex,i*2+1,2),'XX'));
   END LOOP;
-    
-        draw:= replace(draw,'2','0');
-        draw:= replace(draw,'3','1');
-        draw:= replace(draw,'-','0');
 
-       
-        FOR i IN  1..quadro LOOP --reverse
-            aaa_tmp := rpad(substr(draw,(quadro+1)*(quadro-i)+1 ,quadro),(ceil(quadro/8)/*+4*/+d)*8,'0'); --chr(to_number(substr(strhex,i*2+1,2),'XX'));
-           p_t:='';
+       draw:='';
+        FOR i IN reverse 1..quadro LOOP --reverse
+            draw:='';
+            for k in 1..quadro loop draw:=draw||z(i)(k); end loop;
+            draw:= replace(draw,'9','0');
+            draw:= replace(draw,'2','0');
+            draw:= replace(draw,'3','1');
+            aaa_tmp := rpad(draw,(ceil(quadro/8)/*+4*/+d)*8,'0'); 
+
             for j in 1..quadro loop
                     if substr(aaa_tmp,j,1)='0' then aaa_tmp:=regexp_replace(aaa_tmp,'.','1',j,1);
                     else aaa_tmp:=regexp_replace(aaa_tmp,'.','0',j,1);
@@ -1009,13 +814,7 @@ stroka number; tmp1 number; s_s varchar2(2):=''; tmp_draw varchar2(2):=''; flag 
             end loop;
 
         END LOOP;
-      /* 
-    for i in 1 .. trunc(length(aaa) / 2000) + 1 loop
-      dbms_lob.append(bmp_tmp,
-                      utl_raw.cast_to_raw(substr(aaa, 1, 2000)));
-      aaa := substr(aaa, 2000);
-    end loop;
-    */
+
     dbms_lob.append(bmp_tmp, utl_raw.cast_to_raw(trim(aaa)));
     return bmp_tmp;
     dbms_lob.freetemporary(bmp_tmp);
