@@ -19,6 +19,22 @@ BEGIN
    RETURN p_bin;
 END;
 
+function dec2bin (b1 IN number) return varchar2
+as
+ret varchar2(100);nmod number; dev number;
+begin
+if b1=1 then return 1; end if;
+dev:=b1;
+    ret:='';
+while dev>1
+loop
+    ret:=mod(dev,2)||ret;
+    dev:=trunc(dev/2);
+    if dev=1 then ret:=1||ret; end if;
+end loop;
+return ret;
+end;
+
 function bin2dec (b1 IN varchar2) return number
 as
 l1 number:=0;
